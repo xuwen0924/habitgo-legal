@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F2F7FB">
+<title>Habitgo · Collect My Habit Atlas</title>
+<link rel="stylesheet" href="./styles/site-footer.css">
+<script>
+  (() => {
+    const value = new URLSearchParams(window.location.search).get("isDark");
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+
+    const syncThemeColor = (isDark) => {
+      themeColor.setAttribute("content", isDark ? "#233355" : "#F2F7FB");
+    };
+
+    if (value === "true" || value === "false") {
+      const isDark = value === "true";
+      document.documentElement.dataset.theme = isDark ? "dark" : "light";
+      document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+      syncThemeColor(isDark);
+      return;
+    }
+
+    const followSystemTheme = (event) => syncThemeColor(event.matches);
+    syncThemeColor(systemTheme.matches);
+    if (systemTheme.addEventListener) {
+      systemTheme.addEventListener("change", followSystemTheme);
+    } else {
+      systemTheme.addListener(followSystemTheme);
+    }
+  })();
+</script>
+<script defer src="./locales/en.js"></script>
+<script defer src="./locales/zh-CN.js"></script>
+<script defer src="./scripts/site-footer.js"></script>
+<script defer src="./scripts/localization.js"></script>
+<style>
+  :root {
+    --ink: #181817;
+    --copy: #5d5b56;
+    --muted: #85817a;
+    --canvas: #F2F7FB;
+    --surface: rgba(255, 255, 255, .5);
+    --resource-surface: rgba(255, 255, 255, .62);
+    --line: #e6e3dc;
+    --accent: #f5b82e;
+    --link-accent: #b56d13;
+    --glow: rgba(255, 210, 94, .13);
+    --logo-shadow: rgba(122, 82, 17, .12);
+    --hover-line: #d7c9a9;
+    --hover-shadow: rgba(91, 76, 47, .08);
+    --shadow: 0 18px 55px rgba(91, 76, 47, .055);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #F2F7FB;
+      --copy: #D8E1ED;
+      --muted: #AAB8CB;
+      --canvas: #233355;
+      --surface: rgba(45, 64, 103, .72);
+      --resource-surface: rgba(48, 69, 109, .82);
+      --line: #43567D;
+      --link-accent: #FFD36A;
+      --glow: rgba(102, 144, 222, .16);
+      --logo-shadow: rgba(4, 12, 30, .28);
+      --hover-line: #7185AC;
+      --hover-shadow: rgba(4, 12, 30, .24);
+      --shadow: 0 18px 55px rgba(4, 12, 30, .15);
+    }
+  }
+
+  :root[data-theme="light"] {
+    --ink: #181817;
+    --copy: #5d5b56;
+    --muted: #85817a;
+    --canvas: #F2F7FB;
+    --surface: rgba(255, 255, 255, .5);
+    --resource-surface: rgba(255, 255, 255, .62);
+    --line: #e6e3dc;
+    --link-accent: #b56d13;
+    --glow: rgba(255, 210, 94, .13);
+    --logo-shadow: rgba(122, 82, 17, .12);
+    --hover-line: #d7c9a9;
+    --hover-shadow: rgba(91, 76, 47, .08);
+    --shadow: 0 18px 55px rgba(91, 76, 47, .055);
+  }
+
+  :root[data-theme="dark"] {
+    --ink: #F2F7FB;
+    --copy: #D8E1ED;
+    --muted: #AAB8CB;
+    --canvas: #233355;
+    --surface: rgba(45, 64, 103, .72);
+    --resource-surface: rgba(48, 69, 109, .82);
+    --line: #43567D;
+    --link-accent: #FFD36A;
+    --glow: rgba(102, 144, 222, .16);
+    --logo-shadow: rgba(4, 12, 30, .28);
+    --hover-line: #7185AC;
+    --hover-shadow: rgba(4, 12, 30, .24);
+    --shadow: 0 18px 55px rgba(4, 12, 30, .15);
+  }
+
+  * { box-sizing: border-box; }
+
+  [hidden] { display: none !important; }
+
+  button { font: inherit; }
+
+  html { background: var(--canvas); }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 50% -8%, var(--glow), transparent 25rem),
+      var(--canvas);
+    color: var(--ink);
+    font: 17px/1.82 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  main {
+    width: min(100%, 760px);
+    margin: 0 auto;
+    padding: 72px 28px 64px;
+  }
+
+  .page-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin: -36px 0 28px;
+  }
+
+  .language-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--resource-surface);
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 8px 24px var(--hover-shadow);
+    transition: border-color .2s ease, transform .2s ease;
+  }
+
+  .language-trigger:hover {
+    border-color: var(--hover-line);
+    transform: translateY(-1px);
+  }
+
+  .language-trigger:focus-visible,
+  .language-option:focus-visible,
+  .dialog-close:focus-visible {
+    outline: 3px solid rgba(245, 184, 46, .42);
+    outline-offset: 3px;
+  }
+
+  .language-trigger-icon { font-size: 18px; }
+
+  .language-trigger-chevron {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .hero {
+    padding: 0 24px;
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    display: block;
+    width: 92px;
+    height: 92px;
+    margin-bottom: 30px;
+    border-radius: 25%;
+    object-fit: cover;
+    box-shadow: 0 12px 30px var(--logo-shadow);
+  }
+
+  .brand {
+    margin: 0 0 8px;
+    font-size: clamp(27px, 5vw, 34px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -.025em;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(30px, 6vw, 42px);
+    line-height: 1.35;
+    letter-spacing: -.035em;
+  }
+
+  .quote-mark { color: var(--accent); }
+
+  .story-card {
+    padding: 30px 32px 28px;
+    margin: 0 0 24px;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .story-card h2 {
+    margin: 0 0 18px;
+    font-size: 22px;
+    line-height: 1.45;
+    letter-spacing: -.015em;
+  }
+
+  .story-card p {
+    margin: 0 0 14px;
+    color: var(--copy);
+    white-space: pre-line;
+  }
+
+  .story-card p:last-child { margin-bottom: 0; }
+
+  .closing {
+    padding: 28px 32px 18px;
+    color: var(--copy);
+  }
+
+  .closing p { margin: 0 0 18px; }
+
+  .signature {
+    color: var(--ink);
+    font-weight: 650;
+    text-align: right;
+  }
+
+  .language-dialog {
+    width: min(calc(100% - 32px), 430px);
+    max-height: calc(100dvh - 32px);
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    background: var(--canvas);
+    color: var(--ink);
+    box-shadow: 0 30px 90px rgba(4, 12, 30, .28);
+  }
+
+  .language-dialog::backdrop {
+    background: rgba(10, 18, 34, .48);
+    backdrop-filter: blur(5px);
+  }
+
+  .dialog-panel { padding: 26px; }
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .dialog-header h2 {
+    margin: 0;
+    font-size: 23px;
+    line-height: 1.35;
+  }
+
+  .dialog-close {
+    display: grid;
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--resource-surface);
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .dialog-description {
+    margin: 8px 0 20px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .language-options {
+    display: grid;
+    gap: 12px;
+  }
+
+  .language-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 58px;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: 17px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .language-option:hover { border-color: var(--hover-line); }
+
+  .language-option[aria-pressed="true"] {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+
+  .language-check {
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: 800;
+    opacity: 0;
+  }
+
+  .language-option[aria-pressed="true"] .language-check { opacity: 1; }
+
+  @media (max-width: 520px) {
+    body { font-size: 16px; }
+    main { padding: 48px 16px 44px; }
+    .page-toolbar { margin: -24px 2px 24px; }
+    .hero { padding: 0 18px; margin-bottom: 36px; }
+    .logo { width: 82px; height: 82px; margin-bottom: 26px; }
+    .story-card { padding: 25px 22px 23px; border-radius: 24px; }
+    .story-card h2 { font-size: 20px; }
+    .closing { padding: 22px 22px 12px; }
+    .dialog-panel { padding: 22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .language-trigger { transition: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="page-toolbar" hidden>
+    <button
+      id="language-trigger"
+      class="language-trigger"
+      type="button"
+      aria-haspopup="dialog"
+      aria-controls="language-dialog"
+      aria-label="Change language. Current language: English"
+      data-i18n-aria-label="language.triggerLabel"
+    >
+      <span class="language-trigger-icon" aria-hidden="true">🌐</span>
+      <span data-i18n="language.current">English</span>
+      <span class="language-trigger-chevron" aria-hidden="true">▾</span>
+    </button>
+  </div>
+
+  <header class="hero">
+    <img class="logo" src="./images/logo_icon.png" alt="Habitgo Logo" data-i18n-alt="logo.alt" width="92" height="92">
+    <p class="brand" data-i18n="brand.name">Habitgo</p>
+    <h1><span data-i18n="hero.prefix">Collect My </span><span class="quote-mark" data-i18n="hero.openQuote">“</span><span data-i18n="hero.subject">Habit Atlas</span><span class="quote-mark" data-i18n="hero.closeQuote">”</span></h1>
+  </header>
+
+  <section aria-label="The Habitgo story" data-i18n-aria-label="aria.story">
+    <article class="story-card">
+      <h2 data-i18n="story.one.title">🧗‍♀️ I Want to Be Better, but I Always Fall Just Short</h2>
+      <p data-i18n="story.one.p1">I’ve made so many resolutions: wake up early, meditate, read 10 pages a day, stop scrolling before bed…<br>
+        Every time I start, I’m full of confidence—as serious as making a New Year’s wish.<br>
+        But two weeks later, blank spaces begin to appear on my check-in calendar.</p>
+      <p data-i18n="story.one.p2">Research suggests it takes an average of 66 days to form a habit.<br>
+        I often get lost by day 7 😭</p>
+      <p data-i18n="story.one.p3">It’s not that I don’t want to keep going. I just don’t have reminders, company, or someone to tell me—<br>
+        “You’ve already done a great job today.”</p>
+    </article>
+
+    <article class="story-card">
+      <h2 data-i18n="story.two.title">☀️ Simple, with a Little Warmth</h2>
+      <p data-i18n="story.two.p1">I tried a pile of habit apps. Some were too complicated; others felt too cold.<br>
+        Logging one glass of water took five taps, and reading the data felt like checking a report.</p>
+      <p data-i18n="story.two.p2">So we made Habitgo—<br>
+        We want it to feel like a friend who gives you a gentle nudge, not someone chasing you with a whip.</p>
+      <p data-i18n="story.two.p3">We’re a small team of ordinary people who have quit halfway many times ourselves.<br>
+        We know exactly how “I really don’t feel like moving today” feels.</p>
+      <p data-i18n="story.two.p4">Habitgo won’t scold you.<br>
+        It’ll say, “Hey, you haven’t checked in today—but that’s okay. You can start whenever you’re ready.”</p>
+    </article>
+
+    <article class="story-card">
+      <h2 data-i18n="story.three.title">🎯 Habitgo and the Philosophy of Small Steps</h2>
+      <p data-i18n="story.three.p1">“Go” doesn’t mean sprinting. It means taking one step.</p>
+      <p data-i18n="story.three.p2">We believe real change doesn’t come from a burst of willpower.<br>
+        It comes from actions so small they’re hard to fail—<br>
+        one push-up, one page, or one minute of deep breathing.</p>
+      <p data-i18n="story.three.p4">We hope Habitgo stays by your side,<br>
+        turning “I want to” into “I’m doing it,”<br>
+        and “I’m doing it” into “I did it.”</p>
+    </article>
+  </section>
+
+  <section class="closing" aria-label="A note from Habitgo" data-i18n-aria-label="aria.closing">
+    <p data-i18n="closing.message">Remember: even the smallest step today is still a step forward.</p>
+    <p class="signature" data-i18n="closing.signature">— The Habitgo Team</p>
+  </section>
+
+  <div data-habitgo-site-footer></div>
+</main>
+
+<dialog
+  id="language-dialog"
+  class="language-dialog"
+  hidden
+  aria-labelledby="language-dialog-title"
+  aria-describedby="language-dialog-description"
+>
+  <div class="dialog-panel">
+    <div class="dialog-header">
+      <h2 id="language-dialog-title" data-i18n="language.dialogTitle">Choose a language</h2>
+      <button
+        class="dialog-close"
+        type="button"
+        aria-label="Close language selection"
+        data-i18n-aria-label="language.close"
+        data-dialog-close
+      ><span aria-hidden="true">×</span></button>
+    </div>
+    <p id="language-dialog-description" class="dialog-description" data-i18n="language.dialogDescription">Select the language used on this page.</p>
+    <div class="language-options">
+      <button class="language-option" type="button" data-language="en" aria-pressed="false">
+        <span data-i18n="language.english">English</span>
+        <span class="language-check" aria-hidden="true">✓</span>
+      </button>
+      <button class="language-option" type="button" data-language="zh-CN" aria-pressed="false">
+        <span data-i18n="language.chinese">Simplified Chinese</span>
+        <span class="language-check" aria-hidden="true">✓</span>
+      </button>
+    </div>
+  </div>
+</dialog>
+</body>
+</html>
